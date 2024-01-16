@@ -6,13 +6,14 @@ const createLikeRestaurant = async (req, res) => {
   try {
     let { user_id, res_id, date_like } = req.body;
 
-    // kiểm tra người dùng đó đã like nhà hàng chưa, nếu rồi thì không thể like nữa
+    // kiểm tra người dùng đó đã like nhà hàng chưa, nếu like rồi mà like nữa sẽ thành không like
     let exist_like = await conn.like_res.findOne({
       where: { user_id, res_id },
     });
 
     if (exist_like) {
-      return res.send("User has already liked this restaurant !");
+      await exist_like.destroy();
+      return res.send("You have clicked like twice => Unlike");
     }
 
     // Kiểm tra nhà hàng có tồn tại không
@@ -61,7 +62,7 @@ const getListLikeByUser = async (req, res) => {
 const createRateRestaurant = async (req, res) => {
   try {
     let { user_id, res_id, amount, date_rate } = req.body;
-    // Kiểm tra người dùng đó đã đánh giá chưa, nếu rồi thì cập nhật còn chưa thì thêm đánh giá
+    // Kiểm tra người dùng đó đã đánh giá chưa, nếu rồi thì cập nhật đánh giá còn chưa thì thêm đánh giá
     let existRate = await conn.rate_res.findOne({
       where: { user_id, res_id },
     });
